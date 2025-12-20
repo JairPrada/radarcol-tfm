@@ -14,11 +14,13 @@
  */
 
 import { HeroSection } from "@/components/home/HeroSection";
+import { ParticlesBackground } from "@/components/ui";
 
 /**
  * Página principal del landing
  * 
  * Estructura modular que facilita extensión:
+ * - ParticlesBackground: Efecto visual cyberpunk de fondo
  * - HeroSection: Presentación principal con CTA
  * - FeaturesSection: (futuro) Detalles de funcionalidades
  * - StatsSection: (futuro) Estadísticas de impacto
@@ -26,7 +28,8 @@ import { HeroSection } from "@/components/home/HeroSection";
  */
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="relative min-h-screen bg-background overflow-hidden">
+      <ParticlesBackground />
       <HeroSection />
       
       {/* Futuras secciones se agregarán aquí en pasos posteriores */}
