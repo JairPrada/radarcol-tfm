@@ -28,11 +28,13 @@ import { ParticlesBackground } from "@/components/ui";
  */
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen bg-background overflow-hidden">
-      <ParticlesBackground />
-      <HeroSection />
-      
-      {/* Futuras secciones se agregarán aquí en pasos posteriores */}
+    <main className="relative min-h-screen bg-background">
+      <div className="absolute inset-0 z-0">
+        <ParticlesBackground />
+      </div>
+      <div className="relative z-10">
+        <HeroSection />
+      </div>
     </main>
   );
 }

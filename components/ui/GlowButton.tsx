@@ -1,16 +1,16 @@
 /**
  * GlowButton - Botón con efecto neón cyberpunk
- * 
+ *
  * Patrón de diseño: Component Pattern + Strategy Pattern
  * - Component Pattern: Encapsula comportamiento y estilo del botón
  * - Strategy Pattern: Permite diferentes variantes de color (cyan, violet)
- * 
+ *
  * Características:
  * - Efecto glow animado con Framer Motion
  * - Hover interactivo con scale y brightness
  * - Variantes de color configurables
  * - Accesibilidad completa (ARIA labels, keyboard navigation)
- * 
+ *
  * @component
  * @example
  * ```tsx
@@ -60,7 +60,7 @@ const sizeStyles = {
 
 /**
  * Botón con efecto glow neón
- * 
+ *
  * @param {ReactNode} children - Contenido del botón
  * @param {string} variant - Variante de color ("cyan" | "violet")
  * @param {string} size - Tamaño del botón
@@ -86,6 +86,7 @@ export function GlowButton({
         font-bold rounded-lg
         transition-all duration-300
         disabled:opacity-50 disabled:cursor-not-allowed
+        cursor-pointer
         ${className}
       `}
       whileHover={{

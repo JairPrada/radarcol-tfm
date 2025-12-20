@@ -14,7 +14,7 @@
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Info } from "lucide-react";
 import { MainLayout } from "@/components/ui/MainLayout";
 import { ContractDetails } from "@/components/analysis/ContractDetails";
 import { AIExplanation } from "@/components/analysis/AIExplanation";
@@ -118,8 +118,9 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
 
             {/* Nota explicativa sobre SHAP */}
             <div className="p-4 bg-accent-cyan/5 border border-accent-cyan/20 rounded-lg">
-              <h4 className="font-semibold text-foreground mb-2 text-sm">
-                ℹ️ ¿Qué son los valores SHAP?
+              <h4 className="font-semibold text-foreground mb-2 text-sm flex items-center gap-2">
+                <Info className="w-4 h-4 text-accent-cyan" />
+                ¿Qué son los valores SHAP?
               </h4>
               <p className="text-xs text-foreground-muted leading-relaxed">
                 SHAP (SHapley Additive exPlanations) es una técnica de explicabilidad

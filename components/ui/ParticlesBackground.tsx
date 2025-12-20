@@ -2,69 +2,92 @@
 
 /**
  * ParticlesBackground - Animación de partículas para fondo
- * 
+ *
  * Implementa efecto visual cyberpunk con tsParticles.
  * Usa colores del tema (cyan/violet) con movimiento fluido y enlaces sutiles.
- * 
+ *
  * Patrón de diseño: Strategy Pattern
  * - Configuración de partículas encapsulada en options
  * - Fácilmente intercambiable con diferentes configuraciones
- * 
+ *
  * Rendimiento:
  * - Usa @tsparticles/slim (versión optimizada)
  * - FPS limit 60 para evitar overhead
  * - Pocas partículas (50) para mantener fluidez
- * 
+ *
  * @component
  */
 
-import { useCallback } from "react";
-import Particles from "@tsparticles/react";
+import { useEffect, useState, useCallback } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import type { Engine } from "@tsparticles/engine";
 
 export function ParticlesBackground() {
+  const [init, setInit] = useState(false);
+
   /**
    * Inicializa el engine de tsParticles
-   * loadSlim carga solo las características esenciales
+   * Solo renderiza las partículas cuando el engine esté listo
    */
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadSlim(engine);
+  useEffect(() => {
+    initParticlesEngine(async (engine: Engine) => {
+      await loadSlim(engine);
+    }).then(() => {
+      setInit(true);
+    });
   }, []);
+
+  const particlesLoaded = useCallback(async () => {
+    console.log("Particles loaded successfully");
+  }, []);
+
+  if (!init) {
+    return null;
+  }
 
   return (
     <Particles
       id="tsparticles"
-      init={particlesInit}
-      className="absolute inset-0 -z-10 pointer-events-none"
+      className="absolute inset-0 pointer-events-none"
+      style={{ zIndex: 0 }}
+      particlesLoaded={particlesLoaded}
       options={{
         background: {
           color: {
             value: "transparent",
           },
         },
-        fpsLimit: 60,
+        fpsLimit: 120,
         particles: {
           number: {
-            value: 50,
+            value: 100,
             density: {
               enable: true,
-              area: 800,
             },
           },
           color: {
-            value: ["#06b6d4", "#8b5cf6", "#22d3ee"], // cyan, violet, cyan-glow
+            value: ["#06b6d4", "#8b5cf6", "#22d3ee"],
+          },
+          shape: {
+            type: "circle",
+          },
+          opacity: {
+            value: 0.8,
+          },
+          size: {
+            value: 3,
           },
           links: {
             enable: true,
             distance: 150,
             color: "#06b6d4",
-            opacity: 0.2,
-            width: 1,
+            opacity: 0.6,
+            width: 2,
           },
           move: {
             enable: true,
-            speed: 1,
+            speed: 2,
             direction: "none",
             random: false,
             straight: false,
@@ -72,35 +95,27 @@ export function ParticlesBackground() {
               default: "bounce",
             },
           },
-          size: {
-            value: { min: 1, max: 3 },
-          },
-          opacity: {
-            value: { min: 0.3, max: 0.7 },
-            animation: {
-              enable: true,
-              speed: 0.5,
-              sync: false,
-            },
-          },
         },
         interactivity: {
-          detect_on: "canvas",
           events: {
             onHover: {
               enable: true,
               mode: "grab",
             },
-            resize: {
+            onClick: {
               enable: true,
+              mode: "push",
             },
           },
           modes: {
             grab: {
-              distance: 140,
+              distance: 200,
               links: {
-                opacity: 0.5,
+                opacity: 1,
               },
+            },
+            push: {
+              quantity: 4,
             },
           },
         },

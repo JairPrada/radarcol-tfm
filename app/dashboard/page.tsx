@@ -15,7 +15,7 @@
 import { MainLayout } from "@/components/ui/MainLayout";
 import { ContractTable } from "@/components/dashboard/ContractTable";
 import { mockContracts } from "@/data/mockContracts";
-import { Activity, TrendingUp, AlertTriangle } from "lucide-react";
+import { Activity, TrendingUp, AlertTriangle, BarChart3 } from "lucide-react";
 
 /**
  * Calcula estadísticas del dashboard
@@ -109,8 +109,9 @@ export default function DashboardPage() {
         {/* Filters Section (Placeholder para futuro) */}
         <div className="mb-6 p-4 bg-background-card border border-border rounded-lg">
           <div className="flex flex-wrap items-center gap-4">
-            <span className="text-sm text-foreground-muted">
-              📊 Mostrando {stats.total} contratos
+            <span className="flex items-center gap-2 text-sm text-foreground-muted">
+              <BarChart3 className="w-4 h-4 text-accent-cyan" />
+              Mostrando {stats.total} contratos
             </span>
             <span className="text-sm text-foreground-muted">
               • Anomalía promedio: <span className="font-mono font-bold text-accent-cyan">{stats.avgAnomaly}%</span>

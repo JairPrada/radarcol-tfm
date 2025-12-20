@@ -17,7 +17,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Brain, Shield, TrendingUp } from "lucide-react";
+import { Brain, Shield, TrendingUp, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { GlowButton } from "@/components/ui/GlowButton";
 
@@ -94,8 +94,9 @@ export function HeroSection() {
       >
         {/* Badge */}
         <motion.div variants={itemVariants} className="inline-block mb-6">
-          <span className="px-4 py-2 bg-accent-violet/10 text-accent-violet border border-accent-violet/30 rounded-full text-sm font-mono">
-            ✨ Powered by AI & Machine Learning
+          <span className="flex items-center gap-2 px-4 py-2 bg-accent-violet/70 text-white border border-accent-violet/60 rounded-full text-sm font-mono z-50">
+            <Sparkles className="w-4 h-4 text-cyan-300" />
+            Análisis Inteligente de Contratos Públicos
           </span>
         </motion.div>
 
@@ -123,7 +124,10 @@ export function HeroSection() {
         <motion.div variants={itemVariants} className="mb-20">
           <Link href="/dashboard">
             <GlowButton variant="cyan" size="lg">
-              🔍 Iniciar Análisis
+              <span className="flex items-center gap-2">
+                <Search className="w-5 h-5" />
+                Iniciar Análisis
+              </span>
             </GlowButton>
           </Link>
         </motion.div>
@@ -139,7 +143,7 @@ export function HeroSection() {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className="group p-6 rounded-xl bg-background-card border border-border hover:border-accent-cyan/50 transition-all duration-300"
+                className="group p-6 rounded-xl bg-background-card border border-border hover:border-accent-cyan/50 transition-all duration-300 cursor-pointer"
                 whileHover={{ y: -5 }}
               >
                 <div className="mb-4 inline-block p-3 bg-accent-cyan/10 rounded-lg group-hover:bg-accent-cyan/20 transition-colors">

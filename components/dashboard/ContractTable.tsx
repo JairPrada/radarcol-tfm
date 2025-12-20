@@ -123,18 +123,17 @@ export function ContractTable({ contracts }: ContractTableProps) {
               <motion.tr
                 key={contract.id}
                 variants={rowVariants}
-                className="border-b border-border hover:bg-background-light transition-colors cursor-pointer group"
-                whileHover={{ scale: 1.01 }}
+                className="border-b border-border hover:bg-accent-cyan/10 transition-all duration-200 cursor-pointer group"
               >
                 <td className="px-6 py-4">
                   <Link
                     href={`/analysis/${contract.id}`}
-                    className="block group-hover:text-accent-cyan transition-colors"
+                    className="block"
                   >
-                    <div className="font-medium text-foreground">
+                    <div className="font-medium text-foreground group-hover:text-accent-cyan transition-colors">
                       {contract.id}
                     </div>
-                    <div className="text-sm text-foreground-muted mt-1 line-clamp-1">
+                    <div className="text-sm text-foreground-muted group-hover:text-foreground mt-1 line-clamp-1 transition-colors">
                       {contract.nombreContrato}
                     </div>
                   </Link>
@@ -183,7 +182,6 @@ export function ContractTable({ contracts }: ContractTableProps) {
           <motion.div
             key={contract.id}
             variants={rowVariants}
-            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <Link
