@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
+/**
+ * RadarCol - Paleta de Colores Cyberpunk/Data Science
+ * Dark Mode por defecto con acentos neón y sistema de alertas
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Fondos oscuros base */
+  --background: #0f172a; /* slate-900 */
+  --background-light: #1e293b; /* slate-800 */
+  --background-card: #1e293b; /* slate-800 */
+  --foreground: #f1f5f9; /* slate-100 */
+  --foreground-muted: #94a3b8; /* slate-400 */
+  
+  /* Acentos Neón */
+  --accent-cyan: #06b6d4; /* cyan-500 */
+  --accent-cyan-glow: #22d3ee; /* cyan-400 */
+  --accent-violet: #8b5cf6; /* violet-500 */
+  --accent-violet-glow: #a78bfa; /* violet-400 */
+  
+  /* Sistema de Semáforo (Niveles de Alerta) */
+  --alert-high: #ef4444; /* red-500 - Alto riesgo */
+  --alert-high-bg: #991b1b; /* red-800 */
+  --alert-medium: #f59e0b; /* amber-500 - Medio riesgo */
+  --alert-medium-bg: #92400e; /* amber-800 */
+  --alert-low: #10b981; /* emerald-500 - Bajo riesgo */
+  --alert-low-bg: #065f46; /* emerald-800 */
+  
+  /* Bordes y divisores */
+  --border-color: #334155; /* slate-700 */
+  --border-accent: #475569; /* slate-600 */
 }
 
 @theme inline {
+  /* Colores personalizados para Tailwind */
   --color-background: var(--background);
+  --color-background-light: var(--background-light);
+  --color-background-card: var(--background-card);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-cyan-glow: var(--accent-cyan-glow);
+  --color-accent-violet: var(--accent-violet);
+  --color-accent-violet-glow: var(--accent-violet-glow);
+  
+  --color-alert-high: var(--alert-high);
+  --color-alert-high-bg: var(--alert-high-bg);
+  --color-alert-medium: var(--alert-medium);
+  --color-alert-medium-bg: var(--alert-medium-bg);
+  --color-alert-low: var(--alert-low);
+  --color-alert-low-bg: var(--alert-low-bg);
+  
+  --color-border: var(--border-color);
+  --color-border-accent: var(--border-accent);
+  
+  /* Fuentes */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Efectos de Glow para elementos neón */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+}
+
+.glow-violet {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+/* Animación de entrada suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
 }
