@@ -59,18 +59,18 @@ const itemVariants = {
 const features = [
   {
     icon: Brain,
-    title: "IA Avanzada",
-    description: "Algoritmos de machine learning detectan patrones ocultos",
+    title: "IA Explicable",
+    description: "No solo detectamos anomalías, explicamos el porqué en lenguaje natural",
   },
   {
     icon: Shield,
     title: "Análisis de Riesgo",
-    description: "Sistema de semáforo para priorizar anomalías críticas",
+    description: "Sistema de semáforo para priorizar auditorías en contratos críticos",
   },
   {
     icon: TrendingUp,
-    title: "Explicabilidad",
-    description: "SHAP values muestran qué variables influyen en cada predicción",
+    title: "Tiempo Real",
+    description: "API de respuesta inmediata para análisis bajo demanda",
   },
 ];
 
@@ -111,9 +111,9 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
         >
-          Detecta Anomalías en{" "}
+          Convierte Datos Abiertos en{" "}
           <span className="bg-linear-to-r from-accent-cyan to-accent-violet bg-clip-text text-transparent">
-            Contratos Públicos
+            Alertas Tempranas
           </span>
         </motion.h1>
 
@@ -122,8 +122,9 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-xl md:text-2xl text-foreground-muted mb-12 max-w-3xl mx-auto"
         >
-          Plataforma inteligente que analiza millones de datos para identificar
-          patrones sospechosos y proteger la transparencia en contratación pública.
+          Plataforma de inteligencia artificial que detecta anomalías operativas
+          y riesgos de gestión en contratos estatales. Explicaciones claras para
+          decisiones rápidas.
         </motion.p>
 
         {/* CTA Button */}

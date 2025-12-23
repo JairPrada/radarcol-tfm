@@ -13,7 +13,13 @@
  * @page
  */
 
-import { HeroSection } from "@/components/home/HeroSection";
+import {
+  HeroSection,
+  ProcessSection,
+  MetricsSection,
+  ExplainabilitySection,
+  CTASection,
+} from "@/components/home";
 import { ParticlesBackground } from "@/components/ui";
 
 /**
@@ -34,6 +40,10 @@ export default function HomePage() {
       </div>
       <div className="relative z-10">
         <HeroSection />
+        <ProcessSection />
+        <ExplainabilitySection />
+        <MetricsSection />
+        <CTASection />
       </div>
     </main>
   );
