@@ -61,19 +61,25 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         console.log('Iniciando carga de contratos con filtros:', filters);
-        const { contracts, apiResponse } = await fetchContracts(filters, 100); // Obtener más datos para filtrar localmente
-        console.log('Contratos recibidos de API:', contracts.length, contracts);
-        console.log('API Response:', apiResponse);
+        const { contracts, apiResponse } = await fetchContracts(filters, 100);
+        console.log('Contratos recibidos de API:', contracts.length);
+        
         setAllContracts(contracts);
         setApiResponse(apiResponse);
         
-        // Reset pagination cuando cambian los filtros
-        setPagination(prev => ({
-          ...prev,
+        // Aplicar paginación inmediatamente después de cargar
+        const initialPagination = {
           page: 1,
+          pageSize: pagination.pageSize,
           totalItems: contracts.length,
-        }));
-        console.log('Estado actualizado, contratos:', contracts.length);
+        };
+        setPagination(initialPagination);
+        
+        // Calcular resultado paginado inmediatamente
+        const result = paginateData(contracts, 1, pagination.pageSize);
+        console.log('Paginación inicial aplicada:', result);
+        setPaginatedResult(result);
+        
       } catch (error) {
         console.error("Error loading contracts:", error);
         setError(error instanceof Error ? error.message : "Error desconocido");
@@ -83,23 +89,16 @@ export default function DashboardPage() {
     }
 
     loadContracts();
-  }, [filters]); // Dependencia de filtros para recargar cuando cambien
+  }, [filters]); // Solo depende de filtros
 
-  // Efecto separado para paginación
-  useEffect(() => {
+  // Efecto para cambios de página o tamaño de página (no carga inicial)
+  const handlePaginationUpdate = (newPage: number, newPageSize: number) => {
     if (allContracts.length > 0) {
-      const result = paginateData(allContracts, pagination.page, pagination.pageSize);
-      console.log('Paginación aplicada:', { 
-        totalContracts: allContracts.length, 
-        page: pagination.page, 
-        pageSize: pagination.pageSize,
-        resultData: result.data.length 
-      });
+      const result = paginateData(allContracts, newPage, newPageSize);
+      console.log('Actualizando paginación:', { newPage, newPageSize, dataLength: result.data.length });
       setPaginatedResult(result);
-    } else {
-      console.log('No hay contratos para paginar');
     }
-  }, [allContracts, pagination.page, pagination.pageSize]);
+  };
 
   /**
    * Maneja cambios en los filtros
@@ -114,6 +113,7 @@ export default function DashboardPage() {
    */
   const handlePageChange = (page: number) => {
     setPagination(prev => ({ ...prev, page }));
+    handlePaginationUpdate(page, pagination.pageSize);
   };
 
   /**
@@ -123,8 +123,9 @@ export default function DashboardPage() {
     setPagination(prev => ({ 
       ...prev, 
       pageSize, 
-      page: 1 // Reset a la primera página
+      page: 1
     }));
+    handlePaginationUpdate(1, pageSize);
   };
 
   /**
