@@ -11,6 +11,7 @@
  */
 
 import { ContractsApiResponse, ApiContract, Contract } from "@/types/contract";
+import { ContratoAnalisisApiResponse, ContractAnalysis, ApiAnalysisModel } from "@/types/analysis";
 import { apiConfig } from "@/lib/env";
 
 /**
@@ -262,4 +263,121 @@ export function formatLargeAmount(amount: number): string {
     return `$${(amount / 1e9).toFixed(1)}B`;
   }
   return `$${(amount / 1e6).toFixed(0)}M`;
+}
+
+/**
+ * Transforma el análisis del API al formato interno
+ * 
+ * @param apiAnalysis - Análisis del API
+ * @returns Análisis en formato interno con Date objects
+ */
+function transformApiAnalysis(apiAnalysis: ApiAnalysisModel): ContractAnalysis {
+  return {
+    contractId: apiAnalysis.contractId,
+    resumenEjecutivo: apiAnalysis.resumenEjecutivo,
+    factoresPrincipales: apiAnalysis.factoresPrincipales,
+    recomendaciones: apiAnalysis.recomendaciones,
+    shapValues: apiAnalysis.shapValues.map(shap => ({
+      variable: shap.variable,
+      value: shap.value,
+      description: shap.description,
+      actualValue: shap.actualValue,
+    })),
+    probabilidadBase: apiAnalysis.probabilidadBase,
+    confianza: apiAnalysis.confianza,
+    fechaAnalisis: new Date(apiAnalysis.fechaAnalisis),
+  };
+}
+
+/**
+ * Obtiene el análisis detallado de un contrato específico desde el API
+ * 
+ * @param contractId - ID del contrato a analizar
+ * @returns Promise con el contrato y su análisis
+ * @throws Error si la llamada al API falla o el contrato no existe
+ */
+export async function fetchContractAnalysis(contractId: string): Promise<{
+  contract: Contract;
+  analysis: ContractAnalysis;
+}> {
+  try {
+    const url = `${apiConfig.baseUrl}${apiConfig.endpoints.analisisContrato(contractId)}`;
+    
+    console.log('🔍 [API] Obteniendo análisis para contrato:', contractId);
+    console.log('🔍 [API] URL:', url);
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-cache",
+    });
+    
+    console.log('✅ [API] Status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(`Contrato con ID "${contractId}" no encontrado`);
+      }
+      throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+    }
+
+    const apiResponse: ContratoAnalisisApiResponse = await response.json();
+    
+    console.log('📦 [API] Análisis recibido:', {
+      contractId: apiResponse.contract.id,
+      nivelRiesgo: apiResponse.contract.nivelRiesgo,
+      anomalia: apiResponse.contract.anomalia,
+      shapValues: apiResponse.analysis.shapValues.length
+    });
+    
+    // Validación básica de la respuesta
+    if (!apiResponse.contract || !apiResponse.analysis) {
+      throw new Error("Respuesta del API inválida: faltan datos del contrato o análisis");
+    }
+
+    // Transforma el contrato al formato interno
+    const contract: Contract = {
+      id: apiResponse.contract.codigo, // Usar código como ID
+      nombreContrato: apiResponse.contract.descripcion,
+      entidad: apiResponse.contract.entidad,
+      monto: parseFloat(apiResponse.contract.monto.replace(/[^0-9.-]/g, '')), // Parsear string a number
+      fecha: apiResponse.contract.fechaInicio ? new Date(apiResponse.contract.fechaInicio) : null,
+      nivelRiesgo: apiResponse.contract.nivelRiesgo === "Alto" ? "high" : apiResponse.contract.nivelRiesgo === "Medio" ? "medium" : "low",
+      probabilidadAnomalia: apiResponse.contract.anomalia,
+    };
+
+    // Transforma el análisis al formato interno
+    const analysis = transformApiAnalysis(apiResponse.analysis);
+
+    return {
+      contract,
+      analysis,
+    };
+  } catch (error) {
+    console.error("❌ [API] Error obteniendo análisis:", error);
+    console.error("❌ [API] Tipo de error:", error instanceof TypeError ? 'TypeError (CORS/Network)' : error instanceof Error ? error.constructor.name : typeof error);
+    
+    // Re-lanza el error con mensaje más descriptivo
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw new Error(`🚫 No se puede conectar al servidor API en ${apiConfig.baseUrl}
+
+📋 INSTRUCCIONES:
+1️⃣ Verifica que el servidor API esté ejecutándose
+2️⃣ Confirma la URL del endpoint: ${apiConfig.endpoints.analisisContrato(contractId)}
+3️⃣ Verifica que el contrato con ID "${contractId}" existe
+
+🔧 Si el API usa otra URL, configura NEXT_PUBLIC_API_BASE_URL en .env.local`);
+    }
+    
+    if (error instanceof Error && error.message.includes("HTTP")) {
+      throw new Error(`❌ Error del servidor API (${error.message})
+
+El servidor está ejecutándose pero devolvió un error.
+Verifica los logs del servidor API para más detalles.`);
+    }
+    
+    throw error instanceof Error ? error : new Error("Error desconocido al obtener análisis del contrato");
+  }
 }

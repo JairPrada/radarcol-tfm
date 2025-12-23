@@ -14,9 +14,10 @@
  * Configuración del API
  */
 export const apiConfig = {
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000",
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "https://radarcol-model-api.onrender.com",
   endpoints: {
     contratos: "/contratos",
+    analisisContrato: (id: string) => `/contratos/${id}/analisis`,
   },
   timeout: 10000, // 10 segundos
 } as const;

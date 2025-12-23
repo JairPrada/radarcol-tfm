@@ -19,8 +19,7 @@ import { MainLayout } from "@/components/ui/MainLayout";
 import { ContractDetails } from "@/components/analysis/ContractDetails";
 import { AIExplanation } from "@/components/analysis/AIExplanation";
 import { ShapChart } from "@/components/analysis/ShapChart";
-import { fetchContracts } from "@/lib/contractsService";
-import { getAnalysisById } from "@/data/mockAnalysis";
+import { fetchContractAnalysis } from "@/lib/contractsService";
 
 interface AnalysisPageProps {
   params: Promise<{
@@ -38,44 +37,13 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
     // Await params (Next.js 15+)
     const { id } = await params;
     
-    // Obtener contratos del API
-    const { contracts } = await fetchContracts();
-    
-    // Buscar contrato por ID
-    const contract = contracts.find((c) => c.id === id);
+    // Obtener análisis del contrato desde el API
+    const { contract, analysis } = await fetchContractAnalysis(id);
     
     // Si no existe, mostrar 404
-    if (!contract) {
+    if (!contract || !analysis) {
       notFound();
     }
-
-  // Obtener análisis del contrato (ahora siempre devuelve un análisis personalizado)
-  const analysis = getAnalysisById(id, contract);
-
-  // Si no hay análisis disponible (caso excepcional), mostrar mensaje
-  if (!analysis) {
-    return (
-      <MainLayout>
-        <div className="max-w-7xl mx-auto">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-accent-cyan hover:text-accent-cyan-glow transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al Dashboard
-          </Link>
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-foreground mb-2">
-              Análisis no disponible
-            </h1>
-            <p className="text-foreground-muted">
-              El análisis de IA para este contrato aún no está disponible.
-            </p>
-          </div>
-        </div>
-      </MainLayout>
-    );
-  }
 
   return (
     <MainLayout>

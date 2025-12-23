@@ -30,6 +30,16 @@ export interface ShapValue {
 }
 
 /**
+ * Modelo de respuesta del API para SHAP values
+ */
+export interface ApiShapValue {
+  variable: string;
+  value: number;
+  description: string;
+  actualValue: string;
+}
+
+/**
  * Análisis completo generado por IA para un contrato
  */
 export interface ContractAnalysis {
@@ -56,4 +66,40 @@ export interface ContractAnalysis {
   
   /** Fecha del análisis */
   fechaAnalisis: Date;
+}
+
+/**
+ * Modelo de análisis del API
+ */
+export interface ApiAnalysisModel {
+  contractId: string;
+  resumenEjecutivo: string;
+  factoresPrincipales: string[];
+  recomendaciones: string[];
+  shapValues: ApiShapValue[];
+  probabilidadBase: number;
+  confianza: number;
+  fechaAnalisis: string;
+}
+
+/**
+ * Modelo de detalles del contrato en el análisis
+ */
+export interface ApiContractDetailModel {
+  id: string;
+  codigo: string;
+  descripcion: string;
+  entidad: string;
+  monto: string;
+  fechaInicio: string | null;
+  nivelRiesgo: "Alto" | "Medio" | "Bajo";
+  anomalia: number;
+}
+
+/**
+ * Respuesta completa del API para análisis de contrato
+ */
+export interface ContratoAnalisisApiResponse {
+  contract: ApiContractDetailModel;
+  analysis: ApiAnalysisModel;
 }
