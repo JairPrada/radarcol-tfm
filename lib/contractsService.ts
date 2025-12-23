@@ -14,6 +14,39 @@ import { ContractsApiResponse, ApiContract, Contract } from "@/types/contract";
 import { apiConfig } from "@/lib/env";
 
 /**
+ * Interfaz para filtros de contratos basada en la API
+ * Nota: limit se maneja ahora por paginación separada
+ */
+export interface ContractFilters {
+  fechaDesde?: string; // YYYY-MM-DD
+  fechaHasta?: string; // YYYY-MM-DD
+  valorMinimo?: number; // Mínimo: 0
+  valorMaximo?: number; // Mínimo: 0
+  nombreContrato?: string; // Mínimo 3 caracteres
+  idContrato?: string; // ID específico
+}
+
+/**
+ * Interfaz para configuración de paginación
+ */
+export interface PaginationConfig {
+  page: number; // Página actual (1-based)
+  pageSize: number; // Elementos por página (10, 25, 50, 100)
+  totalItems: number; // Total de elementos
+}
+
+/**
+ * Resultado de paginación con metadatos
+ */
+export interface PaginationResult<T> {
+  data: T[]; // Datos de la página actual
+  pagination: PaginationConfig;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  totalPages: number;
+}
+
+/**
  * Convierte el nivel de riesgo de la API al formato interno
  */
 function normalizeRiskLevel(apiLevel: "Alto" | "Medio" | "Bajo"): "high" | "medium" | "low" {
@@ -45,17 +78,60 @@ function transformApiContract(apiContract: ApiContract): Contract {
 }
 
 /**
- * Obtiene todos los contratos desde la API
+ * Construye query parameters para la API basado en filtros
+ * Nota: limit se maneja por separado en la paginación
+ */
+function buildQueryParams(filters?: ContractFilters, limit?: number): string {
+  const params = new URLSearchParams();
+  
+  // Agregar límite si se especifica (para obtener todos los datos)
+  if (limit !== undefined) {
+    params.append("limit", Math.min(Math.max(limit, 1), 100).toString());
+  }
+  
+  if (filters?.fechaDesde) {
+    params.append("fecha_desde", filters.fechaDesde);
+  }
+  
+  if (filters?.fechaHasta) {
+    params.append("fecha_hasta", filters.fechaHasta);
+  }
+  
+  if (filters?.valorMinimo !== undefined && filters.valorMinimo >= 0) {
+    params.append("valor_minimo", filters.valorMinimo.toString());
+  }
+  
+  if (filters?.valorMaximo !== undefined && filters.valorMaximo >= 0) {
+    params.append("valor_maximo", filters.valorMaximo.toString());
+  }
+  
+  if (filters?.nombreContrato && filters.nombreContrato.length >= 3) {
+    params.append("nombre_contrato", filters.nombreContrato);
+  }
+  
+  if (filters?.idContrato) {
+    params.append("id_contrato", filters.idContrato);
+  }
+  
+  return params.toString() ? `?${params.toString()}` : "";
+}
+
+/**
+ * Obtiene contratos desde la API con filtros opcionales
  * 
+ * @param filters - Filtros opcionales para la consulta
  * @returns Promise con la respuesta completa de la API y contratos transformados
  * @throws Error si la llamada al API falla
  */
-export async function fetchContracts(): Promise<{
+export async function fetchContracts(filters?: ContractFilters, limit: number = 100): Promise<{
   apiResponse: ContractsApiResponse;
   contracts: Contract[];
 }> {
   try {
-    const response = await fetch(`${apiConfig.baseUrl}${apiConfig.endpoints.contratos}`, {
+    const queryParams = buildQueryParams(filters, limit);
+    const url = `${apiConfig.baseUrl}${apiConfig.endpoints.contratos}${queryParams}`;
+    
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -134,6 +210,33 @@ export function getDashboardStats(contracts: Contract[], apiResponse: ContractsA
     totalContratosAnalizados: apiResponse.totalContratosAnalizados,
     contratosAltoRiesgo: apiResponse.contratosAltoRiesgo,
     montoTotalCOP: apiResponse.montoTotalCOP,
+  };
+}
+
+/**
+ * Pagina una lista de elementos
+ */
+export function paginateData<T>(
+  data: T[], 
+  page: number, 
+  pageSize: number
+): PaginationResult<T> {
+  const totalItems = data.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedData = data.slice(startIndex, endIndex);
+
+  return {
+    data: paginatedData,
+    pagination: {
+      page,
+      pageSize,
+      totalItems,
+    },
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+    totalPages,
   };
 }
 

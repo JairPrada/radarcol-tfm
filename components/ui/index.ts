@@ -17,3 +17,4 @@ export { ParticlesBackground } from "./ParticlesBackground";
 export { ThemeToggle } from "./ThemeToggle";
 export { AnimatedNumber } from "./AnimatedNumber";
 export { AnimatedProgressBar } from "./AnimatedProgressBar";
+export { TablePagination } from "./TablePagination";

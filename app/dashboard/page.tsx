@@ -16,12 +16,15 @@
 
 import { useEffect, useState } from "react";
 import { MainLayout } from "@/components/ui/MainLayout";
-import { ContractTable } from "@/components/dashboard/ContractTable";
-import { AnimatedNumber, AnimatedProgressBar } from "@/components/ui";
+import { ContractTable, FilterDrawer } from "@/components/dashboard";
+import { AnimatedNumber, AnimatedProgressBar, TablePagination } from "@/components/ui";
 import {
   fetchContracts,
   getDashboardStats,
   formatLargeAmount,
+  paginateData,
+  type ContractFilters as FilterTypes,
+  type PaginationResult,
 } from "@/lib/contractsService";
 import {
   Activity,
@@ -29,30 +32,44 @@ import {
   AlertTriangle,
   BarChart3,
   Percent,
+  Filter,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Contract, ContractsApiResponse } from "@/types/contract";
 
 /**
- * Página del Dashboard - Ahora como Client Component con animaciones
+ * Página del Dashboard - Ahora como Client Component con animaciones y filtros
  */
 export default function DashboardPage() {
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [allContracts, setAllContracts] = useState<Contract[]>([]);
   const [apiResponse, setApiResponse] = useState<ContractsApiResponse | null>(
     null
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FilterTypes>({});
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+    totalItems: 0,
+  });
+  const [paginatedResult, setPaginatedResult] = useState<PaginationResult<Contract> | null>(null);
 
   useEffect(() => {
     async function loadContracts() {
       try {
         setLoading(true);
-        setError(null);
-        const { contracts: fetchedContracts, apiResponse: fetchedApiResponse } =
-          await fetchContracts();
-        setContracts(fetchedContracts);
-        setApiResponse(fetchedApiResponse);
+        const { contracts, apiResponse } = await fetchContracts(filters, 100); // Obtener más datos para filtrar localmente
+        setAllContracts(contracts);
+        setApiResponse(apiResponse);
+        
+        // Reset pagination cuando cambian los filtros
+        setPagination(prev => ({
+          ...prev,
+          page: 1,
+          totalItems: contracts.length,
+        }));
       } catch (error) {
         console.error("Error loading contracts:", error);
         setError(error instanceof Error ? error.message : "Error desconocido");
@@ -62,7 +79,45 @@ export default function DashboardPage() {
     }
 
     loadContracts();
-  }, []);
+  }, [filters]); // Dependencia de filtros para recargar cuando cambien
+
+  // Efecto separado para paginación
+  useEffect(() => {
+    if (allContracts.length > 0) {
+      const result = paginateData(allContracts, pagination.page, pagination.pageSize);
+      setPaginatedResult(result);
+    }
+  }, [allContracts, pagination.page, pagination.pageSize]);
+
+  /**
+   * Maneja cambios en los filtros
+   */
+  const handleFiltersChange = (newFilters: FilterTypes) => {
+    setFilters(newFilters);
+  };
+
+  /**
+   * Maneja cambios de página
+   */
+  const handlePageChange = (page: number) => {
+    setPagination(prev => ({ ...prev, page }));
+  };
+
+  /**
+   * Maneja cambios de tamaño de página
+   */
+  const handlePageSizeChange = (pageSize: number) => {
+    setPagination(prev => ({ 
+      ...prev, 
+      pageSize, 
+      page: 1 // Reset a la primera página
+    }));
+  };
+
+  /**
+   * Cuenta filtros activos
+   */
+  const activeFiltersCount = Object.keys(filters).length;
 
   // Estado de carga
   if (loading) {
@@ -165,7 +220,9 @@ export default function DashboardPage() {
     );
   }
 
-  const stats = getDashboardStats(contracts, apiResponse);
+  // Variables derivadas
+  const currentContracts = paginatedResult?.data || [];
+  const stats = getDashboardStats(allContracts, apiResponse);
 
   return (
     <MainLayout>
@@ -319,49 +376,100 @@ export default function DashboardPage() {
           </motion.div>
         </motion.div>
 
-        {/* Stats Section */}
+        {/* Stats Section con Botón de Filtros */}
         <div className="mb-6 p-4 bg-background-card border border-border rounded-lg hover:bg-background-card/80 transition-all duration-300">
-          <div className="flex flex-wrap items-center gap-4">
-            <span className="flex items-center gap-2 text-sm text-foreground-muted">
-              <BarChart3 className="w-4 h-4 text-accent-cyan" />
-              Mostrando{" "}
-              <AnimatedNumber
-                value={stats.total}
-                duration={1.5}
-                delay={1}
-                className="font-mono font-bold text-accent-cyan"
-              />{" "}
-              contratos de{" "}
-              <AnimatedNumber
-                value={stats.totalContratosAnalizados}
-                duration={2}
-                delay={1.2}
-                className="font-mono font-bold text-accent-cyan"
-              />{" "}
-              analizados
-            </span>
-            <span className="text-sm text-foreground-muted">
-              • Anomalía promedio:{" "}
-              <AnimatedNumber
-                value={stats.avgAnomaly}
-                duration={1.5}
-                delay={1.4}
-                formatter={(val) => `${val}%`}
-                className="font-mono font-bold text-accent-cyan"
-              />
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="flex items-center gap-2 text-sm text-foreground-muted">
+                <BarChart3 className="w-4 h-4 text-accent-cyan" />
+                Mostrando{" "}
+                <AnimatedNumber
+                  value={currentContracts.length}
+                  duration={1.5}
+                  delay={1}
+                  className="font-mono font-bold text-accent-cyan"
+                />{" "}
+                contratos de{" "}
+                <AnimatedNumber
+                  value={stats.totalContratosAnalizados}
+                  duration={2}
+                  delay={1.2}
+                  className="font-mono font-bold text-accent-cyan"
+                />{" "}
+                analizados
+              </span>
+              <span className="text-sm text-foreground-muted">
+                • Anomalía promedio:{" "}
+                <AnimatedNumber
+                  value={stats.avgAnomaly}
+                  duration={1.5}
+                  delay={1.4}
+                  formatter={(val) => `${val}%`}
+                  className="font-mono font-bold text-accent-cyan"
+                />
+              </span>
+            </div>
+
+            {/* Botón de Filtros */}
+            <motion.button
+              onClick={() => setIsFilterDrawerOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-accent-cyan text-white rounded-lg hover:bg-accent-cyan-glow transition-colors font-medium relative"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Filter className="w-4 h-4" />
+              Filtros
+              {activeFiltersCount > 0 && (
+                <motion.span
+                  className="absolute -top-2 -right-2 bg-alert-high text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                >
+                  {activeFiltersCount}
+                </motion.span>
+              )}
+            </motion.button>
           </div>
         </div>
 
         {/* Table */}
         <motion.div
-          className="bg-background-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-500"
+          className="bg-background-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-500 mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.6 }}
         >
-          <ContractTable contracts={contracts} />
+          <ContractTable contracts={currentContracts} />
         </motion.div>
+
+        {/* Paginación */}
+        {paginatedResult && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.8 }}
+          >
+            <TablePagination
+              pagination={paginatedResult.pagination}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              totalPages={paginatedResult.totalPages}
+              hasNextPage={paginatedResult.hasNextPage}
+              hasPrevPage={paginatedResult.hasPrevPage}
+            />
+          </motion.div>
+        )}
+
+        {/* Filter Drawer */}
+        <FilterDrawer
+          isOpen={isFilterDrawerOpen}
+          onClose={() => setIsFilterDrawerOpen(false)}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          isLoading={loading}
+          activeFiltersCount={activeFiltersCount}
+        />
       </div>
     </MainLayout>
   );

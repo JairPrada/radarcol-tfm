@@ -10,3 +10,5 @@
  */
 
 export { ContractTable } from "./ContractTable";
+export { ContractFilters } from "./ContractFilters";
+export { FilterDrawer } from "./FilterDrawer";
