@@ -88,13 +88,17 @@ export function Badge({
         ${config.styles}
         ${sizeStyles[size]}
         border rounded-full font-medium
+        max-w-full truncate
         ${className}
       `}
       role="status"
       aria-label={config.label}
+      title={typeof children === 'string' ? children : config.label}
     >
-      <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-      {children}
+      <Icon className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+      <span className="truncate min-w-0">
+        {children}
+      </span>
     </span>
   );
 }
