@@ -133,7 +133,7 @@ export function ContractTable({ contracts }: ContractTableProps) {
                     href={`/analysis/${contract.id}`}
                     className="block"
                   >
-                    <div className="font-medium text-foreground group-hover:text-accent-cyan transition-colors">
+                    <div className="font-medium text-foreground group-hover:text-accent-cyan transition-colors font-mono">
                       {contract.id}
                     </div>
                     <div className="text-sm text-foreground-muted group-hover:text-foreground mt-1 line-clamp-1 transition-colors">
@@ -192,7 +192,7 @@ export function ContractTable({ contracts }: ContractTableProps) {
               className="block p-4 bg-background-card border border-border rounded-lg hover:border-accent-cyan/50 transition-all"
             >
               {/* Header */}
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start gap-3 mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="font-mono text-sm text-accent-cyan mb-1">
                     {contract.id}
@@ -201,9 +201,11 @@ export function ContractTable({ contracts }: ContractTableProps) {
                     {contract.nombreContrato}
                   </h3>
                 </div>
-                <Badge variant={contract.nivelRiesgo} size="sm">
-                  {riskLevelText[contract.nivelRiesgo]}
-                </Badge>
+                <div className="flex-shrink-0">
+                  <Badge variant={contract.nivelRiesgo} size="sm">
+                    {riskLevelText[contract.nivelRiesgo]}
+                  </Badge>
+                </div>
               </div>
 
               {/* Details */}
