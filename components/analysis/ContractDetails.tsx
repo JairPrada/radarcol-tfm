@@ -59,14 +59,16 @@ export function ContractDetails({ contract, className = "" }: ContractDetailsPro
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header con ID y Nivel de Riesgo */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="text-sm text-foreground-muted mb-1">ID del Contrato</div>
-          <h2 className="text-2xl font-bold font-mono text-accent-cyan">{contract.id}</h2>
+      <div className="mb-6">
+        <div className="text-sm text-foreground-muted mb-2">ID del Contrato</div>
+        <div className="mb-3">
+          <Badge variant={contract.nivelRiesgo}>
+            {riskLevelText[contract.nivelRiesgo]} Riesgo
+          </Badge>
         </div>
-        <Badge variant={contract.nivelRiesgo}>
-          {riskLevelText[contract.nivelRiesgo]} Riesgo
-        </Badge>
+        <h2 className="text-2xl font-bold font-mono text-accent-cyan">
+          {contract.id}
+        </h2>
       </div>
 
       {/* Probabilidad de Anomalía */}
