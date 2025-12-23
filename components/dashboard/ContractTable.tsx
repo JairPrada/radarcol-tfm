@@ -98,7 +98,7 @@ export function ContractTable({ contracts }: ContractTableProps) {
         <div className="max-w-md mx-auto">
           <div className="mb-4 text-foreground-muted">
             <svg
-              className="w-16 h-16 mx-auto mb-4 text-accent-cyan opacity-50"
+              className="w-12 h-12 mx-auto mb-3 text-accent-cyan opacity-50"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -111,7 +111,7 @@ export function ContractTable({ contracts }: ContractTableProps) {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-base font-semibold text-foreground mb-1.5">
             No se encontraron resultados
           </h3>
           <p className="text-sm text-foreground-muted">

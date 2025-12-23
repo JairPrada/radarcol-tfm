@@ -179,10 +179,10 @@ export default function DashboardPage() {
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
-            <h2 className="text-2xl font-bold text-foreground mt-4 mb-2">
+            <h2 className="text-lg font-semibold text-foreground mt-4 mb-2">
               Cargando Dashboard...
             </h2>
-            <p className="text-foreground-muted">
+            <p className="text-sm text-foreground-muted">
               Obteniendo datos del API de contratos
             </p>
           </div>
@@ -202,31 +202,31 @@ export default function DashboardPage() {
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 100 }}
             >
-              <AlertTriangle className="w-20 h-20 text-alert-high mx-auto mb-6" />
+              <AlertTriangle className="w-16 h-16 text-alert-high mx-auto mb-4" />
             </motion.div>
 
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-xl font-semibold text-foreground mb-3">
               No se pudieron cargar los contratos
             </h2>
 
-            <p className="text-foreground-muted mb-8 max-w-md mx-auto">
+            <p className="text-sm text-foreground-muted mb-6 max-w-md mx-auto">
               No se pudo conectar con el servidor. Por favor, intenta nuevamente.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-accent-cyan text-white rounded-lg hover:bg-accent-cyan-glow transition-colors font-medium"
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-accent-cyan text-white rounded-lg hover:bg-accent-cyan-glow transition-colors font-medium"
               >
-                <RefreshCw className="w-5 h-5" />
+                <RefreshCw className="w-4 h-4" />
                 Reintentar
               </button>
 
               <a
                 href="/"
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-background-light border border-border text-foreground rounded-lg hover:bg-background-card transition-colors font-medium"
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-background-light border border-border text-foreground rounded-lg hover:bg-background-card transition-colors font-medium"
               >
-                <Home className="w-5 h-5" />
+                <Home className="w-4 h-4" />
                 Ir al Inicio
               </a>
             </div>
