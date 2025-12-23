@@ -10,10 +10,49 @@
 /**
  * Nivel de riesgo de anomalía detectado por el modelo de IA
  */
-export type RiskLevel = "high" | "medium" | "low";
+export type RiskLevel = "Alto" | "Medio" | "Bajo";
 
 /**
- * Contrato público analizado por RadarCol
+ * Metadata de la respuesta del API
+ */
+export interface ApiMetadata {
+  fuenteDatos: string;
+  camposSimulados: string[];
+}
+
+/**
+ * Información del contrato anidada en la respuesta del API
+ */
+export interface ContratoInfo {
+  Codigo: string;
+  Descripcion: string;
+}
+
+/**
+ * Contrato público desde la API
+ */
+export interface ApiContract {
+  Contrato: ContratoInfo;
+  Entidad: string;
+  Monto: string;
+  FechaInicio: string | null;
+  NivelRiesgo: RiskLevel;
+  Anomalia: number;
+}
+
+/**
+ * Respuesta completa del API de contratos
+ */
+export interface ContractsApiResponse {
+  metadata: ApiMetadata;
+  totalContratosAnalizados: number;
+  contratosAltoRiesgo: number;
+  montoTotalCOP: number;
+  contratos: ApiContract[];
+}
+
+/**
+ * Contrato público normalizado para uso interno
  * 
  * @interface Contract
  */
@@ -31,10 +70,10 @@ export interface Contract {
   monto: number;
   
   /** Fecha de firma del contrato */
-  fecha: Date;
+  fecha: Date | null;
   
   /** Nivel de riesgo calculado por el modelo */
-  nivelRiesgo: RiskLevel;
+  nivelRiesgo: "high" | "medium" | "low";
   
   /** Probabilidad de anomalía (0-100%) */
   probabilidadAnomalia: number;
