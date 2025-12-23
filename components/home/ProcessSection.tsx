@@ -1,23 +1,54 @@
 /**
  * ProcessSection - El proceso de detección de anomalías en 3 pasos
- * 
+ *
  * Patrón de diseño: Timeline Pattern
  * - Muestra proceso secuencial simplificado
  * - Enfoque en la explicabilidad y transparencia
- * 
+ *
  * Características:
  * - 3 pasos del proceso de análisis inteligente
  * - Layout responsivo con numeración clara
  * - Animaciones de entrada escalonadas
  * - Iconos contextuales sin revelar arquitectura
- * 
+ *
  * @component
  */
 
 "use client";
 
 import { motion } from "framer-motion";
-import { Database, Scan, MessageSquare } from "lucide-react";
+import { Database, Cpu, Brain } from "lucide-react";
+import Lottie from "lottie-react";
+import { useEffect, useState } from "react";
+
+/**
+ * URLs públicas de animaciones de LottieFiles
+ * Usando animaciones de la galería pública de LottieFiles
+ */
+const LOTTIE_ANIMATIONS = {
+  database:
+    "https://lottie.host/288981f5-e278-4dae-8285-c594120a725e/zkXFlCcfiN.json", // Server/Database
+  processing:
+    "https://lottie.host/5c988a28-88fc-438b-9498-dc208654a613/lotC1GojYm.json", // AI/Analysis
+  brain:
+    "https://lottie.host/74e4cafa-b971-44c5-9b56-7800d159b8b2/2VYfXezOdZ.json", // Chat/Communication
+};
+
+/**
+ * Hook para cargar animación desde URL
+ */
+function useLottieUrl(url: string) {
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch(url)
+      .then((res) => res.json())
+      .then((json) => setData(json))
+      .catch(() => setData(null));
+  }, [url]);
+
+  return data;
+}
 
 /**
  * Variants para animaciones orquestadas
@@ -46,32 +77,38 @@ const itemVariants = {
 };
 
 /**
- * Proceso simplificado en 3 pasos
+ * Proceso simplificado en 3 pasos con animaciones Lottie
  */
 const steps = [
   {
     number: "01",
+    lottieUrl: LOTTIE_ANIMATIONS.database,
     icon: Database,
     title: "Ingesta Inteligente",
     description:
       "Procesamiento masivo de más de 5 millones de registros históricos de SECOP. Consolidamos datos abiertos en tiempo real para un análisis exhaustivo.",
     highlight: "+5M contratos",
+    color: "cyan" as const,
   },
   {
     number: "02",
-    icon: Scan,
+    lottieUrl: LOTTIE_ANIMATIONS.processing,
+    icon: Cpu,
     title: "Detección Multidimensional",
     description:
       "Nuestros algoritmos identifican patrones fuera de la norma en más de 50 indicadores clave. Detectamos desviaciones de comportamiento y anomalías operativas en milisegundos.",
     highlight: "+50 indicadores",
+    color: "violet" as const,
   },
   {
     number: "03",
-    icon: MessageSquare,
+    lottieUrl: LOTTIE_ANIMATIONS.brain,
+    icon: Brain,
     title: "IA Explicable",
     description:
-      "No solo decimos \"es anómalo\". Explicamos el porqué en lenguaje natural. Combinamos análisis interpretable con inteligencia generativa para que auditores tomen decisiones informadas.",
+      'No solo decimos "es anómalo". Explicamos el porqué en lenguaje natural. Combinamos análisis interpretable con inteligencia generativa para que auditores tomen decisiones informadas.',
     highlight: "Lenguaje natural",
+    color: "cyan" as const,
   },
 ];
 
@@ -109,6 +146,8 @@ export function ProcessSection() {
         >
           {steps.map((step, index) => {
             const Icon = step.icon;
+            const isCyan = step.color === "cyan";
+            const animationData = useLottieUrl(step.lottieUrl);
 
             return (
               <motion.div
@@ -123,9 +162,52 @@ export function ProcessSection() {
 
                 {/* Card */}
                 <div className="h-full pt-12 p-8 rounded-2xl bg-background-card border border-border hover:border-accent-violet/50 transition-all duration-300 group-hover:shadow-xl">
-                  {/* Icon */}
-                  <div className="mb-6 inline-flex p-4 rounded-xl bg-accent-violet/10 group-hover:bg-accent-violet/20 transition-colors">
-                    <Icon className="w-8 h-8 text-accent-violet" />
+                  {/* Lottie Animation with Fallback */}
+                  <div className="mb-6 mx-auto w-32 h-32 flex items-center justify-center relative">
+                    {animationData ? (
+                      <Lottie
+                        animationData={animationData}
+                        loop={true}
+                        autoplay={true}
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    ) : (
+                      <>
+                        {/* Background Glow */}
+                        <motion.div
+                          className={`absolute inset-0 rounded-full blur-2xl ${
+                            isCyan ? "bg-accent-cyan/20" : "bg-accent-violet/20"
+                          }`}
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            opacity: [0.5, 0.8, 0.5],
+                          }}
+                          transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        />
+                        {/* Fallback Icon with Animation */}
+                        <motion.div
+                          animate={{
+                            y: [0, -10, 0],
+                            rotate: [0, 5, -5, 0],
+                          }}
+                          transition={{
+                            duration: 4,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        >
+                          <Icon
+                            className={`w-20 h-20 animate-pulse ${
+                              isCyan ? "text-accent-cyan" : "text-accent-violet"
+                            }`}
+                          />
+                        </motion.div>
+                      </>
+                    )}
                   </div>
 
                   {/* Title */}

@@ -221,6 +221,21 @@ export function ExplainabilitySection() {
                 Lenguaje Natural
               </span>
             </motion.div>
+
+            {/* AI Brain Animation */}
+            <motion.div
+              className="absolute -bottom-6 -left-6 w-32 h-32 opacity-20"
+              animate={{
+                scale: [1, 1.1, 1],
+                rotate: [0, 5, -5, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+            </motion.div>
           </motion.div>
         </div>
       </motion.div>
