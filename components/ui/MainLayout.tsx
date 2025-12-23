@@ -1,10 +1,10 @@
 /**
  * MainLayout - Layout base para la aplicación RadarCol
- * 
+ *
  * Patrón de diseño: Composite Pattern
  * Proporciona una estructura consistente para todas las páginas,
  * permitiendo composición flexible de elementos (header, footer, sidebar, etc.)
- * 
+ *
  * @component
  */
 
@@ -22,12 +22,12 @@ interface MainLayoutProps {
 
 /**
  * Layout principal de la aplicación
- * 
+ *
  * @param {ReactNode} children - Contenido de la página
  * @param {boolean} showHeader - Mostrar header (por defecto: true)
  * @param {boolean} showFooter - Mostrar footer (por defecto: true)
  * @param {string} className - Clases CSS adicionales para el container
- * 
+ *
  * @example
  * ```tsx
  * <MainLayout>
@@ -47,12 +47,17 @@ export function MainLayout({
         <header className="sticky top-0 z-50 border-b border-border bg-background-light/80 backdrop-blur-sm">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                <h1 className="text-2xl font-bold text-accent-cyan">
-                  Radar<span className="text-accent-violet">Col</span>
+              <Link
+                href="/"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
+                <h1 className="text-2xl font-bold">
+                  <span className="bg-gradient-to-r from-accent-cyan to-accent-violet bg-clip-text text-transparent">
+                    RadarCol
+                  </span>
                 </h1>
               </Link>
-              
+
               {/* Navegación básica */}
               <nav className="flex items-center gap-4">
                 <Link
@@ -69,7 +74,7 @@ export function MainLayout({
                   <LayoutDashboard className="w-4 h-4" />
                   <span className="hidden sm:inline">Dashboard</span>
                 </Link>
-                
+
                 {/* Toggle de tema */}
                 <div className="ml-2 pl-4 border-l border-border">
                   <ThemeToggle />
@@ -87,7 +92,10 @@ export function MainLayout({
       {showFooter && (
         <footer className="border-t border-border bg-background-light py-6">
           <div className="container mx-auto px-4 text-center text-sm text-foreground-muted">
-            <p>&copy; {new Date().getFullYear()} RadarCol. Detección inteligente de anomalías.</p>
+            <p>
+              &copy; {new Date().getFullYear()} RadarCol. Detección inteligente
+              de anomalías.
+            </p>
           </div>
         </footer>
       )}
