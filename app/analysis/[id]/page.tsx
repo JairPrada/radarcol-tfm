@@ -19,7 +19,7 @@ import { MainLayout } from "@/components/ui/MainLayout";
 import { ContractDetails } from "@/components/analysis/ContractDetails";
 import { AIExplanation } from "@/components/analysis/AIExplanation";
 import { ShapChart } from "@/components/analysis/ShapChart";
-import { mockContracts } from "@/data/mockContracts";
+import { fetchContracts } from "@/lib/contractsService";
 import { getAnalysisById } from "@/data/mockAnalysis";
 
 interface AnalysisPageProps {
@@ -34,16 +34,20 @@ interface AnalysisPageProps {
  * @param {string} params.id - ID del contrato a analizar
  */
 export default async function AnalysisPage({ params }: AnalysisPageProps) {
-  // Await params (Next.js 15+)
-  const { id } = await params;
-  
-  // Buscar contrato por ID
-  const contract = mockContracts.find((c) => c.id === id);
-  
-  // Si no existe, mostrar 404
-  if (!contract) {
-    notFound();
-  }
+  try {
+    // Await params (Next.js 15+)
+    const { id } = await params;
+    
+    // Obtener contratos del API
+    const { contracts } = await fetchContracts();
+    
+    // Buscar contrato por ID
+    const contract = contracts.find((c) => c.id === id);
+    
+    // Si no existe, mostrar 404
+    if (!contract) {
+      notFound();
+    }
 
   // Obtener análisis del contrato
   const analysis = getAnalysisById(id);
@@ -136,4 +140,28 @@ export default async function AnalysisPage({ params }: AnalysisPageProps) {
       </div>
     </MainLayout>
   );
+  } catch (error) {
+    // Manejo de errores - mostrar mensaje amigable al usuario
+    return (
+      <MainLayout>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              Error al cargar el análisis
+            </h2>
+            <p className="text-foreground-muted mb-4">
+              {error instanceof Error ? error.message : "Error desconocido"}
+            </p>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 text-accent-cyan hover:text-accent-cyan-glow transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Volver al Dashboard
+            </Link>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 }
