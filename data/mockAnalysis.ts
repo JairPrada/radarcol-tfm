@@ -7,6 +7,7 @@
  */
 
 import { ContractAnalysis } from "@/types/analysis";
+import { Contract } from "@/types/contract";
 
 /**
  * Mapa de análisis por ID de contrato
@@ -441,8 +442,112 @@ export const mockAnalyses: Record<string, ContractAnalysis> = {
 };
 
 /**
- * Obtiene el análisis de un contrato por su ID
+ * Obtiene un análisis mock aleatorio pero consistente para un ID dado
+ * Usado como fallback cuando no se tienen datos del contrato
  */
-export function getAnalysisById(contractId: string): ContractAnalysis | undefined {
-  return mockAnalyses[contractId];
+function getConsistentMockAnalysis(contractId: string): ContractAnalysis | undefined {
+  const mockIds = Object.keys(mockAnalyses);
+  if (mockIds.length === 0) return undefined;
+  
+  // Usar hash simple del ID para obtener siempre el mismo análisis mock para el mismo contrato
+  let hash = 0;
+  for (let i = 0; i < contractId.length; i++) {
+    const char = contractId.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  const index = Math.abs(hash) % mockIds.length;
+  const selectedMockId = mockIds[index];
+  const analysis = mockAnalyses[selectedMockId];
+  
+  if (!analysis) return undefined;
+  
+  // Crear una copia del análisis con el ID correcto
+  return {
+    ...analysis,
+    contractId: contractId, // Usar el ID real del contrato
+    fechaAnalisis: new Date(), // Fecha actual para simular análisis reciente
+  };
+}
+
+/**
+ * Crea análisis dinámico basado en datos del contrato
+ */
+function createDynamicAnalysis(contract: Contract): ContractAnalysis {
+  // Seleccionar análisis base según nivel de riesgo
+  const riskBasedAnalyses: Record<string, string[]> = {
+    high: ["CONT-2024-001", "CONT-2024-004"], // Análisis de alto riesgo
+    medium: ["CONT-2024-003", "CONT-2024-006"], // Análisis de riesgo medio  
+    low: ["CONT-2024-005", "CONT-2024-007"] // Análisis de bajo riesgo
+  };
+  
+  const possibleAnalyses = riskBasedAnalyses[contract.nivelRiesgo] || riskBasedAnalyses.medium;
+  
+  // Hash para selección consistente
+  let hash = 0;
+  for (let i = 0; i < contract.id.length; i++) {
+    const char = contract.id.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  const index = Math.abs(hash) % possibleAnalyses.length;
+  const templateAnalysisId = possibleAnalyses[index];
+  const templateAnalysis = mockAnalyses[templateAnalysisId];
+  
+  if (!templateAnalysis) {
+    // Fallback al primer análisis disponible
+    const firstAnalysis = Object.values(mockAnalyses)[0];
+    return {
+      ...firstAnalysis,
+      contractId: contract.id,
+      fechaAnalisis: new Date(),
+    };
+  }
+  
+  // Personalizar el análisis con datos del contrato real
+  const montoFormateado = new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+  }).format(contract.monto);
+  
+  return {
+    ...templateAnalysis,
+    contractId: contract.id,
+    fechaAnalisis: new Date(),
+    // Personalizar resumen con datos reales
+    resumenEjecutivo: `El análisis del contrato "${contract.nombreContrato}" (${montoFormateado}) con ${contract.entidad} muestra un **nivel de riesgo ${contract.nivelRiesgo === 'high' ? 'alto' : contract.nivelRiesgo === 'medium' ? 'medio' : 'bajo'}** con ${contract.probabilidadAnomalia}% de probabilidad de anomalía. ${templateAnalysis.resumenEjecutivo.split('.').slice(1).join('.').trim()}`,
+    // Actualizar primer factor con datos reales
+    factoresPrincipales: [
+      `Contrato: "${contract.nombreContrato}" por ${montoFormateado}`,
+      `Entidad contratante: ${contract.entidad}`,
+      `Probabilidad de anomalía: ${contract.probabilidadAnomalia}%`,
+      ...templateAnalysis.factoresPrincipales.slice(3)
+    ]
+  };
+}
+
+/**
+ * Obtiene el análisis de un contrato por su ID
+ * Primero busca análisis específicos, luego crea análisis dinámico
+ * 
+ * @param contractId - ID del contrato
+ * @param contract - Datos del contrato (opcional, para análisis más personalizado)
+ */
+export function getAnalysisById(contractId: string, contract?: Contract): ContractAnalysis | undefined {
+  // Primero intenta buscar análisis específico
+  const specificAnalysis = mockAnalyses[contractId];
+  if (specificAnalysis) {
+    return specificAnalysis;
+  }
+  
+  // Si se proporcionan datos del contrato, crear análisis dinámico personalizado
+  if (contract) {
+    return createDynamicAnalysis(contract);
+  }
+  
+  // Fallback: análisis consistente genérico
+  return getConsistentMockAnalysis(contractId);
 }
