@@ -88,7 +88,26 @@ export async function fetchContracts(): Promise<{
     
     // Re-lanza el error con mensaje más descriptivo
     if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw new Error(`Error de conexión: No se puede conectar al servidor. Verifica que el API esté ejecutándose en ${apiConfig.baseUrl}`);
+      throw new Error(`🚫 No se puede conectar al servidor API en ${apiConfig.baseUrl}
+
+📋 INSTRUCCIONES:
+1️⃣ Verifica que el servidor API esté ejecutándose
+2️⃣ Confirma que esté usando el puerto 8000
+3️⃣ Prueba la URL manualmente: ${apiConfig.baseUrl}${apiConfig.endpoints.contratos}
+
+💡 COMANDOS TÍPICOS:
+• python -m uvicorn main:app --port 8000
+• python app.py
+• node server.js
+
+🔧 Si el API usa otro puerto, configura NEXT_PUBLIC_API_BASE_URL en .env.local`);
+    }
+    
+    if (error instanceof Error && error.message.includes("HTTP")) {
+      throw new Error(`❌ Error del servidor API (${error.message})
+
+El servidor está ejecutándose pero devolvió un error.
+Verifica los logs del servidor API para más detalles.`);
     }
     
     throw error instanceof Error ? error : new Error("Error desconocido al obtener contratos");
